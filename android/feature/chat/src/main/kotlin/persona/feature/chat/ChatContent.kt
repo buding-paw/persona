@@ -239,6 +239,7 @@ internal fun ChatPicture(session: SessionKey, item: Item, loader: ImageLoader, a
 /** [userImages] renders neighboring user-image rows in the same bubble; hide those rows with [imagesInUserBubble].
  * [workRunning] comes from the parent work group's live flag; [lastWorkStep] ends its timeline connector; [plan] is the
  * group's plan ([latestPlan]): its TodoWrite is the plan card, the group's other TodoWrites are not drawn (web #1990).
+ * [waiting]: the session is blocked on you (status `blocked`); a running work line then reads "Waiting for you".
  */
 @Composable
 internal fun ChatLineContent(
@@ -254,6 +255,7 @@ internal fun ChatLineContent(
     lastWorkStep: Boolean = false,
     plan: LinePlan? = null,
     showSourceLabel: Boolean = true,
+    waiting: Boolean = false,
 ) {
     val res = LocalResources.current
     when (line) {
@@ -286,7 +288,10 @@ internal fun ChatLineContent(
             // While it runs, the plan and the newest steps show under "Working…" and a ticking clock (web #1990); done,
             // it folds to its summary. Persona's own chat keeps one sentence that counts its time up every second (R1).
             val trace = line.live && !style.compactToolSummary
-            val now by rememberNow(1_000, enabled = line.live && !trace)
+            // Blocked on you, the turn stays open (folding and the plan card as while it runs), but its line says it waits:
+            // no "Working…", no clock, no spinner, as the header says "Waiting for you".
+            val waits = waiting && line.live
+            val now by rememberNow(1_000, enabled = line.live && !trace && !waits)
             // The Workflow calls whose runs the session lists keep their cards out of the fold (#3435): under the line
             // while it is folded, in their own place among its steps once open. Only a line with such a call reads the
             // runs, so a run's progress redraws no other line.
@@ -296,9 +301,9 @@ internal fun ChatLineContent(
             val peek = remember(line.steps, trace, cards) {
                 if (trace) workPeek(line.steps, cards = cards.mapNotNullTo(mutableSetOf()) { it.toolUseId }) else null
             }
-            WorkGroup(workSummary(res, line, recordedDuration, now.takeIf { line.live }, peek = trace), line.open,
-                { onToggle(line.id) }, running = line.live,
-                trailing = if (trace) ({ WorkClock(line) }) else null,
+            WorkGroup(workSummary(res, line, recordedDuration, now.takeIf { line.live }, peek = trace, waiting = waits), line.open,
+                { onToggle(line.id) }, running = line.live && !waits,
+                trailing = if (trace && !waits) ({ WorkClock(line) }) else null,
                 peek = peek?.takeIf { it.plan != null || it.steps.isNotEmpty() }?.let { shown -> {
                     shown.plan?.let { PlanStep(it, running = true, nested = true) }
                     shown.steps.forEachIndexed { i, step ->

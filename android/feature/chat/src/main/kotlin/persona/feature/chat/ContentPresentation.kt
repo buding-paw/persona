@@ -398,9 +398,12 @@ internal fun WorkItem.Folded.stepCount(): Int = item.fold?.let { it.tools + it.t
 /**
  * The words on a work line. A running one says what it is doing and, given [now], how long it has run (R1, ticking
  * every second like iOS's "Working 39 s"). With [peek] its latest steps show under it, so it only says
- * "Working…"; the time is a leaf of its own beside it (web #1990).
+ * "Working…"; the time is a leaf of its own beside it (web #1990). [waiting]: the session is blocked on you (a plan or a
+ * permission to approve), so a running line says what the header says, "Waiting for you", with no time: nothing is at work.
  */
-internal fun workSummary(res: Resources, line: ChatLine.Work, recordedDuration: Long?, now: Instant? = null, peek: Boolean = false): String {
+internal fun workSummary(res: Resources, line: ChatLine.Work, recordedDuration: Long?, now: Instant? = null, peek: Boolean = false,
+    waiting: Boolean = false): String {
+    if (line.live && waiting) return res.getString(R.string.chat_chrome_status_needs_you)
     val count = line.steps.sumOf { if (it is WorkItem.Folded) it.stepCount() else 1 }
     if (line.live && peek) return res.getString(R.string.chat_work_working_ellipsis)
     if (line.live) {
