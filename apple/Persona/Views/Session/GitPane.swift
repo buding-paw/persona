@@ -9,6 +9,8 @@ struct GitPane: View {
     var group: String = ""
     let cwd: String
     @Binding var status: GitStatus?
+    /// Opens the review of the session's changes at a scope (#151); nil where there is none (no `git_review`, the Mac).
+    var review: ((GitReviewScope?) -> Void)? = nil
     @State private var error: String?
     @State private var older: [GitCommit] = []
     @State private var noMore = false
@@ -148,6 +150,13 @@ struct GitPane: View {
                     Spacer()
                     Text("+\(added)").foregroundStyle(Theme.Diff.add)
                     Text("−\(deleted)").foregroundStyle(Theme.Diff.del)
+                    if let review {
+                        // Review from here starts at the uncommitted changes, the ones this list shows.
+                        Button { review(.uncommitted) } label: { Label("Review", systemImage: Theme.Icon.reviewChanges).lineLimit(1) }
+                            .themedButton()
+                            .textCase(nil)
+                            .accessibilityIdentifier("git.review")
+                    }
                 }
                 .monospacedDigit()
             }
