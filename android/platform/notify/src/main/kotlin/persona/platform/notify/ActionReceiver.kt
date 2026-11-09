@@ -55,6 +55,8 @@ open class ActionReceiver : BroadcastReceiver() {
                                 sessions.sessions.value.firstOrNull { it.key == key }
                             }
                         },
+                        // A request gone from the hub that this phone claimed was its own answer (a second tap): no notice.
+                        claimed = { dependencies.actionJournal().claimed(it) },
                     ).execute(id, action, reply,
                         locked = { lockedAfterUnlockSettles({ keyguard.isDeviceLocked }) },
                         onInteraction = { session = it.sessionKey; request = it },
