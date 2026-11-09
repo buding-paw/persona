@@ -32,6 +32,14 @@ internal class NotificationActionExecutor(
     /** Whether this phone already claimed a request; only reads, never claims ([NotificationActionJournal.claimed]). */
     private val claimed: (String) -> Boolean = { false },
 ) {
+    /**
+     * A notification button's executor ([ActionReceiver]): its claims and its check for a request this phone already
+     * answered both go to this phone's [journal] (#2483). [onClaimed] hears each claim it makes.
+     */
+    constructor(center: InteractionCenter, journal: NotificationActionJournal, session: suspend (SessionKey) -> Session?,
+        onClaimed: () -> Unit = {}) :
+        this(center, { id -> journal.claim(id).also { if (it) onClaimed() } }, session = session, claimed = journal::claimed)
+
     suspend fun execute(
         id: String,
         key: String,
