@@ -398,8 +398,9 @@ internal fun WorkItem.Folded.stepCount(): Int = item.fold?.let { it.tools + it.t
 /**
  * The words on a work line. A running one says what it is doing and, given [now], how long it has run (R1, ticking
  * every second like iOS's "Working 39 s"). With [peek] its latest steps show under it, so it only says
- * "Working…"; the time is a leaf of its own beside it (web #1990). [waiting]: the session is blocked on you (a plan or a
- * permission to approve), so a running line says what the header says, "Waiting for you", with no time: nothing is at work.
+ * "Working…"; the time is a leaf of its own beside it (web #1990). [waiting]: the turn waits on you (a question, a plan or a
+ * permission to answer, [turnWaitsOnYou]), so a running line says what the header says, "Waiting for you", with no time:
+ * nothing is at work.
  */
 internal fun workSummary(res: Resources, line: ChatLine.Work, recordedDuration: Long?, now: Instant? = null, peek: Boolean = false,
     waiting: Boolean = false): String {
