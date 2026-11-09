@@ -15,7 +15,7 @@ import org.robolectric.annotation.Config
 import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [35])
+@Config(sdk = [35], qualifiers = "en")
 class ContentPresentationTest {
     private val res get() = ApplicationProvider.getApplicationContext<Context>().resources
 
