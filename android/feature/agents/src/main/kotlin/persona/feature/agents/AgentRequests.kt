@@ -84,6 +84,9 @@ internal fun RequestCard(
                     style = PersonaTheme.type.caption, color = PersonaTheme.palette.ink3) }
                 if (!approvable && !readOnly) Text(stringResource(R.string.agents_approve_blocked),
                     style = PersonaTheme.type.caption, color = PersonaTheme.palette.cautionText)
+                // Offline its buttons are greyed out: say why, as the full page does (#2483).
+                if (!online && !readOnly && approvable && !expired) Text(stringResource(R.string.agents_request_offline),
+                    style = PersonaTheme.type.caption, color = PersonaTheme.palette.cautionText)
                 if (request.needsFieldValues && !request.isSecretRun && approvable && !readOnly) Text(stringResource(R.string.agents_request_fields_elsewhere),
                     style = PersonaTheme.type.caption, color = PersonaTheme.palette.ink2)
                 delivery?.let { RequestDeliveryStatus(it) }
