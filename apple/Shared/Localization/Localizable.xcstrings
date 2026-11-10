@@ -1462,6 +1462,28 @@
         }
       }
     },
+    "Submit Without Them" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submit Without Them"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未回答のまま送信"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不答直接提交"
+          }
+        }
+      }
+    },
     "Submitted": {
       "extractionState": "manual",
       "localizations": {
@@ -12067,6 +12089,28 @@
       },
       "extractionState" : "manual"
     },
+    "%lld questions, %lld answered, on question %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld questions, %2$lld answered, on question %3$lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全%1$lld問中%2$lld問回答済み、現在%3$lld問目"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "共 %1$lld 个问题，已答 %2$lld 个，当前第 %3$lld 个"
+          }
+        }
+      }
+    },
     "%lld queued · Claude will handle them in order" : {
       "localizations" : {
         "en" : {
@@ -20214,6 +20258,28 @@
       },
       "extractionState" : "manual"
     },
+    "Answer “%@”" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answer “%@”"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」に回答"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回答「%@」"
+          }
+        }
+      }
+    },
     "Answered" : {
       "localizations" : {
         "en" : {
@@ -20323,6 +20389,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在 Agent 的提问里答的"
+          }
+        }
+      }
+    },
+    "Answered on the computer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Answered on the computer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンピュータで回答済み"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已在电脑上回答"
           }
         }
       }
@@ -74780,6 +74868,28 @@
       },
       "extractionState" : "manual"
     },
+    "Not answered" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not answered"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未回答"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未回答"
+          }
+        }
+      }
+    },
     "Not asked yet" : {
       "localizations" : {
         "en" : {
@@ -93085,6 +93195,28 @@
       },
       "extractionState" : "manual"
     },
+    "Review Your Answers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review Your Answers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回答を確認"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "核对回答"
+          }
+        }
+      }
+    },
     "Review [Extensions Model 9fdfd7]" : {
       "localizations" : {
         "en" : {
@@ -106783,6 +106915,28 @@
       },
       "extractionState" : "manual"
     },
+    "Submit %lld Answers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submit %lld Answers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld件の回答を送信"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提交 %lld 个回答"
+          }
+        }
+      }
+    },
     "Submit Plan" : {
       "localizations" : {
         "en" : {
@@ -107473,6 +107627,28 @@
         }
       },
       "extractionState" : "manual"
+    },
+    "Switching questions…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switching questions…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "質問を切り替え中…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在切换题目…"
+          }
+        }
+      }
     },
     "Sync %@" : {
       "localizations" : {
@@ -115592,6 +115768,28 @@
         }
       },
       "extractionState" : "manual"
+    },
+    "The terminal didn't move to another question. Check it with View Terminal." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The terminal didn't move to another question. Check it with View Terminal."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ターミナルが別の質問に移りませんでした。「ターミナルを表示」で確認してください。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "终端没有切到另一题，点「查看终端」看看。"
+          }
+        }
+      }
     },
     "The terminal is asking you" : {
       "localizations" : {
