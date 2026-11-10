@@ -275,6 +275,10 @@ For embedded signatures, retain the complete envelope and verify the exact decod
 
 Sockets passed by socket activation (`LISTEN_FDS`, descriptors 3 and up) are not close-on-exec, and Go's `os/exec` does not close what is not: every process started before the hub marks them is handed the hub's listening port, and hands it on to everything it starts in turn. The hub without its edge marked them only when it first listened, and it could start the built-in manager before that; the manager, the local node, extension programs and the agents the node started then all held the hub's listening socket (several pids on `ss -tlnp` for the hub's port). Take what a process was handed first thing, before anything can start a child (`claimInherited`, `osproc.SealInherited`); hand a child a descriptor only through `exec.Cmd.ExtraFiles`. Never seal in `main` of a binary whose helper commands hand descriptors on by exec (the sandbox's launcher passes its mount data to bwrap that way).
 
+## A process that execs itself inherits its own children (2026-11-10, #2978)
+
+`syscall.Exec` keeps the pid, so every child of the old image (the update watchdog, the herdr server, bridges, the hub's manager) is the new image's child, and no `exec.Cmd` there knows it. Once one exits it stays a zombie until the process ends; `init: true` in Docker does not help, since the zombie's parent is personad, not init. The resident node, the hub and a manager all replace themselves this way, so each calls `osproc.ReapInherited` next to `osproc.SealInherited`, before it starts any child: it waits for each pid listed as its child then, never for -1, which could take a child an `exec.Cmd` waits for.
+
 ## A fixed name in the temp folder is shared on Linux (2026-11-07, #66)
 
 `os.TempDir()` is the per-user `$TMPDIR` on macOS but the shared `/tmp` on Linux, so a fixed name there (`persona-herdr-server.log`, `persona-orca-images`) looks private on a Mac and is not on a Linux node. Another local user can create the name first: a symlink makes the next `O_CREATE|O_TRUNC` open empty and write into a file of the node's user, and a world-writable folder receives every file written into it, since `MkdirAll` succeeds on an existing folder whatever its owner or mode. Keep such files under `privateCacheDir` (`internal/node/cachedir.go`: the user's cache folder, checked to be a private folder of this user; a per-process `os.MkdirTemp` folder when there is none).
@@ -621,6 +625,7 @@ Splitting a registry at its first colon reads `[::1]:5000` as `[`, selecting HTT
 
 - Linux `setsid` detaches the process group, not the systemd service cgroup: when node startup fails, the manager kills rollback processes in the same cgroup (#1158). Recovery must run in a separate transient user service and be ready before binary replacement. Complete its readiness handshake before acquiring the update-directory lock, or the parent waits for readiness holding the lock while recovery waits for that lock. Tests use fake `systemd-run`, never installing recovery services on the development machine.
 - A missing identity and an unavailable identity need different fallback decisions (#2910). A Linux zombie keeps both its procfs start time and its `ps -o lstart=` result, so rejecting it in `osproc.Identify` alone still lets a watchdog check count it as alive. Preserve the difference between a live exact identity, a known exited process, and an unreadable identity; only the last needs a weaker reading. Check for known exit even for older markers without exact identities. Tests can hold a deterministic zombie with `waitid(WEXITED|WNOWAIT)` after SIGKILL, then reap it during cleanup.
+- Detaching a child does not change who must reap it (#2978). `cmd.Start` then `cmd.Process.Release()` leaves a watchdog in its own session that, once it exits while the parent runs on (a canceled node commit, a failed hub exec), stays a zombie for the parent's life. Keep a background `cmd.Wait()` instead, as both update watchdogs do; an exec hands the child to the new image.
 - On macOS, reopening an already-executed signed Mach-O staging file with `O_RDWR` may cause later self-check retries to receive `SIGKILL` (#1158). Use a read-only handle for post-validation `fsync`; don't request write access just to sync. Canceled commits return before self-check. Verify busy / cancellation retries five consecutive times, not just first execution.
 - macOS UNIX socket path limits are short; test names plus default long `TMPDIR` may exceed them (#1158). Socket fixtures use a short separate `/tmp` root, or `TMPDIR=/tmp` in isolation; don't blame the updater or change production sockets.
   New tests easily repeat this: `t.TempDir()` includes the test name (and subtest name), so a socket a few levels below exceeds the limit (#2257, #2278). Linux's limit is 108 bytes and its `TMPDIR` is short; Linux-only testing misses this.
@@ -1491,6 +1496,22 @@ A connector that folds several notifications into one thread (GitHub CI failures
   any row the appender leaves to encoding/json, so the bytes and the errors stay its. Compare against `json.Marshal`
   for nil, empty, HTML characters, U+2028 and invalid UTF-8 (`TestSessionsChangedBytesAreJSONMarshal`).
 
+## The push before the list: decoded from nil, copied, read three times, checked again (2026-11-10, #2950)
+
+- `json.Unmarshal` into a nil slice grows it by doubling, so a decoded list of 1,520-byte rows costs about twice its
+  size before anything copies it. Decode a runtime's push into a slice sized from that connection's last list and
+  normalize it in place (`out := list[:0]`, then `clear` the tail). Give every push an array of its own rather than
+  decoding into the last one: rows already handed out are read under their own lock, and json leaves fields of a
+  reused element that the input does not mention as they were. A list that shrank keeps no array of the old size.
+- Reading two side fields with two more `json.Unmarshal` calls parses the whole push twice more. Read them in one
+  pass, but keep the separate reads as the fallback: a field of the wrong type fails a combined decode, while each
+  single read only failed for its own field (`TestRuntimeRowExtrasReadsAsEachAlone`).
+- Bytes known to be `json.Marshal`'s output still go through the envelope's checks, compaction and escaping as a
+  `json.RawMessage`, copied twice into buffers that grow. Mark them (`rpc.Marshaled`) and write the line by hand only
+  when nothing in it can need escaping: a plain ASCII event name, non-empty params. Compare the line with
+  `json.Marshal`'s for HTML characters, U+2028, control characters and invalid UTF-8 (`TestNotifyMarshaledIsTheSameLine`).
+  Give the type a `MarshalJSON`, or a `[]byte` passed anywhere else is written as base64.
+
 ## Transport source is not pane origin (#994)
 
 A `runtime` session can be an Orca native desktop chat, a CLI in a terminal pane, a botmux topic or an unhosted runtime. Classify pane/host origins from the metadata, with desktop markers taking precedence, and keep transport filtering separate. New query keys need an independent advertised capability because an old hub may silently ignore them and return the wrong membership. Count the full matching index revision, and bind the origin to frozen cursors and delta membership even when the transport and timestamp never change.
@@ -1511,6 +1532,13 @@ A Hub-only receipt requires unchanged node versions. When the user explicitly en
 
 After activating matching native and downloadable packages, reapply an enabled runtime node policy through its existing settings route so managers recheck the new pointer. A filesystem pointer change has no consumer watcher. Check the current policy first so an intervening disable is respected; a failed recheck must not produce a completed publication receipt.
 
+
+## Release status reporting is opt-in (#2671)
+
+A source validation result and a deployment result are different facts. Keep release
+logs and receipts regardless of whether GitHub accepts commit statuses. Default both
+release workers to no status writes; explicit opt-in retains all three transitions,
+including errors. Never fabricate a success to remove an old failing status.
 ## Idle wakeups: a ticker per watch, a P per core, a fallback that never waits (2026-11-09, #2590)
 
 - A goroutine with a ticker of its own per watched session looks free, but every tick wakes the scheduler, and each tick opened, stat'ed and closed the transcript whether or not it grew. Two tickers per watch (250 ms transcript, 1 s status line) made 4 watched sessions at rest cost +260 ms of CPU and +9,150 context switches a minute over none. One ticker for every watch (`watchPump`), a stat before the open (`transcript.File.Changed`, and the same gate at the start of `refresh`), and goroutines only for work that can be slow (reading new lines, reading a screen) brought it to +60 ms and +2,420. What is left is mostly the 4 Hz tick itself: wakeups of the runtime's timer thread and sysmon, not work. Keep a guard per watch (`reading`, `live.reading`) so a slow parse or screen read skips that watch's ticks, as a busy ticker did, without holding up the others; and a lock taken on a tick must be a `TryLock` (a file being paged answers "changed").
@@ -1584,3 +1612,7 @@ When server tests read a shared fixture outside `server/`, include it in `script
 relative path and create its remote parent directory. The inbox list tests read `scripts/mock/inbox_events.json`;
 copying only the Go module left them failing on the test machine. Extend the fake remote launcher test to read the
 staged fixture from the package directory, check refreshed contents, and reject a missing source before Go starts.
+
+## A node error without a code reads as "the hub is down" (2026-11-10, #1888)
+
+A node method that answers a refusal with a plain `errors.New` / `fmt.Errorf` has no code, so `apierr.Call` treats it as `internal` and the hub answers 502 with the generic `rpc-errors.failed` summary; the real reason survives only in `detail`, which no client shows. Web words every 502 as "the hub can't respond right now", iOS and Android show "The request could not be completed": a dirty worktree or a missing upstream looked like a broken hub. A refusal the user can act on goes out as `refusal(code, english message, data)`, its code goes into `rpcFailureKeys` with a summary in every `rpc-errors` locale (name `{reason}` there to keep git's or the program's own words), and the hub then answers a 409 in the client's language. Success texts follow the same rule: answer a code (`outcome`) the clients put into their own strings, and keep an English `message` for older clients.
