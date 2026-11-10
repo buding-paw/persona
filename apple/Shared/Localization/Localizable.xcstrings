@@ -323,6 +323,29 @@
         }
       }
     },
+    "Computer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Computer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コンピュータ"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "电脑"
+          }
+        }
+      }
+    },
     "Copied %@'s clipboard to this phone": {
       "extractionState": "manual",
       "localizations": {
@@ -365,6 +388,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "已把 %1$@ 的图片复制到这台手机"
+          }
+        }
+      }
+    },
+    "Copies a computer's clipboard (text or an image) to this phone and returns the text. The computer needs clipboard sharing turned on in Persona.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copies a computer's clipboard (text or an image) to this phone and returns the text. The computer needs clipboard sharing turned on in Persona."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コンピュータのクリップボード（テキストまたは画像）をこのスマートフォンにコピーし、テキストを返します。Persona でそのコンピュータのクリップボード共有をオンにしておく必要があります。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把电脑剪贴板里的文字或图片复制到手机，并返回其中的文字。需要先在 Persona 里给这台电脑打开剪贴板共享。"
           }
         }
       }
@@ -465,6 +511,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "取回剪贴板"
+          }
+        }
+      }
+    },
+    "Get Computer's Clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get Computer's Clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コンピュータのクリップボードを取得"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取回电脑剪贴板"
+          }
+        }
+      }
+    },
+    "Get the clipboard of ${machine}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get the clipboard of ${machine}"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "${machine} のクリップボードを取得"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取回 ${machine} 的剪贴板"
           }
         }
       }
@@ -849,6 +941,29 @@
         }
       }
     },
+    "No computer shares its clipboard yet. Turn on clipboard sharing on a computer's page in Persona.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No computer shares its clipboard yet. Turn on clipboard sharing on a computer's page in Persona."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリップボードを共有しているコンピュータがまだありません。Persona のコンピュータのページでオンにしてください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "还没有电脑打开剪贴板共享。请在 Persona 里电脑的页面上打开。"
+          }
+        }
+      }
+    },
     "No plans waiting for you to start" : {
       "localizations" : {
         "en" : {
@@ -1132,6 +1247,29 @@
         }
       }
     },
+    "Puts this phone's clipboard, or the text you pass in, on a computer's clipboard. The computer needs clipboard sharing turned on in Persona.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puts this phone's clipboard, or the text you pass in, on a computer's clipboard. The computer needs clipboard sharing turned on in Persona."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このスマートフォンのクリップボード（または渡したテキスト）をコンピュータのクリップボードに入れます。Persona でそのコンピュータのクリップボード共有をオンにしておく必要があります。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把手机的剪贴板（或传入的文字）放到电脑的剪贴板上。需要先在 Persona 里给这台电脑打开剪贴板共享。"
+          }
+        }
+      }
+    },
     "Record a Meeting" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1352,6 +1490,52 @@
         }
       }
     },
+    "Send Clipboard to Computer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send Clipboard to Computer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリップボードをコンピュータに送信"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送剪贴板到电脑"
+          }
+        }
+      }
+    },
+    "Send the clipboard to ${machine}": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send the clipboard to ${machine}"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリップボードを ${machine} に送信"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把剪贴板发到 ${machine}"
+          }
+        }
+      }
+    },
     "Send what you just copied to %@?": {
       "extractionState": "manual",
       "localizations": {
@@ -1394,6 +1578,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "直接发送，不弹粘贴确认"
+          }
+        }
+      }
+    },
+    "Sent instead of the clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sent instead of the clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリップボードの代わりに送る内容"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "代替剪贴板发送的内容"
           }
         }
       }
