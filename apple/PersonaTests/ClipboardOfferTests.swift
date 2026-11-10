@@ -32,4 +32,18 @@ struct ClipboardOfferTests {
         #expect(ClipboardOffer.target(all, preferred: asleep.ref.path)?.id == "a", "the last one is offline: the first ready one")
         #expect(ClipboardOffer.target([off, unsupported, asleep], preferred: nil) == nil)
     }
+
+    /// Everything is off until the user turns it on (#3064): an older hub's machine (no `clipboard`) is never offered or
+    /// usable, an empty state is off and unsupported, and the offer setting is off when never set.
+    @Test func everythingIsOffByDefault() throws {
+        let old = try JSON.decoder.decode(Machine.self, from: Data(#"{"id":"mac","name":"Mac","kind":"local","online":true}"#.utf8))
+        #expect(old.clipboard == nil && old.clipboard?.usable != true)
+        #expect(ClipboardOffer.target([old], preferred: old.ref.path) == nil)
+        let empty = try JSON.decoder.decode(MachineClipboard.self, from: Data("{}".utf8))
+        #expect(!empty.supported && !empty.enabled && !empty.usable)
+        #expect(MachineClipboard() == empty)
+        let fresh = try #require(UserDefaults(suiteName: "clipboard-offer-default-\(UUID().uuidString)"))
+        #expect(!fresh.bool(forKey: ClipboardOffer.enabledKey))
+        #expect(!ClipboardOffer.shouldOffer(enabled: fresh.bool(forKey: ClipboardOffer.enabledKey), seen: 1, now: 2, hasContent: true))
+    }
 }

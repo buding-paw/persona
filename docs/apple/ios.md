@@ -681,7 +681,8 @@ app treats as unsupported and off (no section, never offered).
 - **Limits**: iOS can't read the clipboard in the background, so phone → computer is always a tap (no automatic sync); computer → phone needs the app (or a shortcut) too.
 - **Screenshots and tests**: `MOCK_CLIPBOARD=off|on|image python3 scripts/mock/mock_hub.py` (`MOCK_CLIPBOARD_FAIL=1`: every read and write fails as `clipboard_failed`); `-tab settings -openMachines YES -openMachineDetail macbook -openMachineClipboard YES`
   (scrolled to the section), `-showClipboardFetch YES` (runs Get on opening), `-showClipboardHint YES`. `ClipboardSectionTests` (UI, `TEST_RUNNER_PERSONA_CLIPBOARD_HUB`)
-  runs Get → Send → hint and the offer; unit tests `ClipboardModelTests`, `ClipboardOfferTests`, `ClipboardIntentsTests`. The simulator could not answer "Allow Paste?"
+  runs Get → Send → hint and the offer; with `MOCK_CLIPBOARD=off` and `TEST_RUNNER_PERSONA_CLIPBOARD_STATE=off` it checks the default-off state
+  (the switch and its explanation only, no buttons; the offer setting off). A hub without `clipboard` on a machine hides the section and never offers it; unit tests `ClipboardModelTests`, `ClipboardOfferTests`, `ClipboardIntentsTests`. The simulator could not answer "Allow Paste?"
   for what another app copied (its TCC store refused the answer, 2026-11-10), so the prompt itself is checked on a device.
 
 ## Effort and permission modes

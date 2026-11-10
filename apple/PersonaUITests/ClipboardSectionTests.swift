@@ -1,7 +1,8 @@
 import UIKit
 import XCTest
 
-/// Clipboard on a computer's page (#3064), against scripts/mock/mock_hub.py with MOCK_CLIPBOARD=on
+/// Clipboard on a computer's page (#3064), against scripts/mock/mock_hub.py with MOCK_CLIPBOARD=on, or =off with
+/// `TEST_RUNNER_PERSONA_CLIPBOARD_STATE=off` for the default-off state (the switch only, the offer setting off)
 /// (`TEST_RUNNER_PERSONA_CLIPBOARD_HUB`): Get Clipboard puts MacBook's on the phone and previews it, Send Clipboard puts
 /// the phone's on MacBook's, then the one-time paste hint comes; with the setting on, coming back after copying elsewhere
 /// offers to send it. PERSONA_SHOTS keeps the screenshots, named by `TEST_RUNNER_PERSONA_LOOK`. The simulator's "Allow
@@ -26,6 +27,7 @@ final class ClipboardSectionTests: XCTestCase {
     /// Get, then Send what Get put on the phone back, then the hint. Copied by this app, it is read without "Allow
     /// Paste?"; a prompt that does come (a device, something another app copied) is answered Allow.
     @MainActor func testGetThenSendThenTheHint() throws {
+        guard env["PERSONA_CLIPBOARD_STATE"] != "off" else { throw XCTSkip("MOCK_CLIPBOARD=on") }
         let app = try open()
         app.buttons["clipboard-get"].firstMatch.tap()
         let preview = app.descendants(matching: .any)["clipboard-preview"].firstMatch
@@ -50,9 +52,33 @@ final class ClipboardSectionTests: XCTestCase {
         XCTAssertTrue(hint.waitForNonExistence(timeout: 5))
     }
 
+    /// Off by default (MOCK_CLIPBOARD=off): the switch with its explanation and nothing to tap, and the offer setting off.
+    @MainActor func testOffByDefault() throws {
+        guard env["PERSONA_CLIPBOARD_STATE"] == "off" else { throw XCTSkip("MOCK_CLIPBOARD=off (PERSONA_CLIPBOARD_STATE=off)") }
+        let app = try open()
+        let toggle = app.switches["clipboard-switch"].firstMatch
+        XCTAssertEqual(toggle.value as? String, "0")
+        XCTAssertTrue(toggle.label.contains("默认关闭"), toggle.label)
+        XCTAssertFalse(app.buttons["clipboard-send"].exists)
+        XCTAssertFalse(app.buttons["clipboard-get"].exists)
+        XCTAssertFalse(app.buttons["system-paste"].exists)
+        shot(app, "clipboard-default-off")
+        app.terminate()
+
+        app.launchArguments = Array(app.launchArguments.prefix(2)) + ["-tab", "settings", "-openConnectorDevice", "YES"] // the same pairing
+        app.launchPinned()
+        let offer = app.switches["clipboard-offer"].firstMatch
+        XCTAssertTrue(app.navigationBars.firstMatch.waitForExistence(timeout: 30))
+        for _ in 0..<4 where !(offer.exists && offer.isHittable) { app.swipeUp() }
+        XCTAssertTrue(offer.waitForExistence(timeout: 5))
+        XCTAssertEqual(offer.value as? String, "0", "the offer is opt-in")
+        shot(app, "clipboard-offer-default-off")
+    }
+
     /// Settings › Phone Data › Clipboard, then back from another app after copying: the offer to send it (a toast in its
     /// own window, out of XCUITest's sight: the screenshot shows it).
     @MainActor func testOfferAfterCopyingElsewhere() throws {
+        guard env["PERSONA_CLIPBOARD_STATE"] != "off" else { throw XCTSkip("MOCK_CLIPBOARD=on") }
         guard let hub = env["PERSONA_CLIPBOARD_HUB"] else { throw XCTSkip("needs scripts/mock/mock_hub.py with MOCK_CLIPBOARD=on (PERSONA_CLIPBOARD_HUB)") }
         let app = XCUIApplication()
         let pair = "persona://pair?url=" + hub.addingPercentEncoding(withAllowedCharacters: .alphanumerics)! + "&token=" + UITestToken.device
