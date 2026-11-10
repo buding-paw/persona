@@ -93,6 +93,52 @@
         }
       }
     },
+    "%@'s clipboard holds hidden content (such as a password), so it wasn't copied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@'s clipboard holds hidden content (such as a password), so it wasn't copied"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ のクリップボードは非表示の内容（パスワードなど）のため、コピーしませんでした"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 的剪贴板里是隐藏内容（比如密码），没有复制"
+          }
+        }
+      }
+    },
+    "%@'s clipboard is empty": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@'s clipboard is empty"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ のクリップボードは空です"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 的剪贴板是空的"
+          }
+        }
+      }
+    },
     "A call or another app paused the recording. Open Persona to continue it." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -254,6 +300,52 @@
         }
       }
     },
+    "Copied %@'s clipboard to this phone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied %1$@'s clipboard to this phone"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ のクリップボードをこのスマートフォンにコピーしました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已把 %1$@ 的剪贴板复制到这台手机"
+          }
+        }
+      }
+    },
+    "Copied the image from %@ to this phone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied the image from %1$@ to this phone"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ の画像をこのスマートフォンにコピーしました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已把 %1$@ 的图片复制到这台手机"
+          }
+        }
+      }
+    },
     "Copy" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -329,6 +421,29 @@
         "en": { "stringUnit": { "state": "translated", "value": "Deleted from this device. Removal from Knowledge may still be pending." } },
         "zh-Hans": { "stringUnit": { "state": "translated", "value": "已从此设备删除。从知识库移除可能仍在等待同步。" } },
         "ja": { "stringUnit": { "state": "translated", "value": "このデバイスから削除しました。ナレッジからの削除はまだ同期待ちの可能性があります。" } }
+      }
+    },
+    "Image sent to %@'s clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image sent to %1$@'s clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画像を %1$@ のクリップボードに送りました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "图片已发到 %1$@ 的剪贴板"
+          }
+        }
       }
     },
     "It carries on by itself when the call ends, or when you come back to Persona." : {
@@ -710,6 +825,29 @@
         }
       }
     },
+    "Nothing to send: the clipboard is empty, or pasting wasn't allowed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to send: the clipboard is empty, or pasting wasn't allowed"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "送る内容がありません。クリップボードが空か、ペーストが許可されませんでした"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有可发送的内容：剪贴板是空的，或者没有允许粘贴"
+          }
+        }
+      }
+    },
     "Open Questions" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1003,6 +1141,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "录音中…打开"
+          }
+        }
+      }
+    },
+    "Sent to %@'s clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sent to %1$@'s clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ のクリップボードに送りました"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已发到 %1$@ 的剪贴板"
           }
         }
       }
