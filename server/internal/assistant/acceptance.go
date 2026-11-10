@@ -47,6 +47,9 @@ type acceptAsk struct {
 	AskedAt    time.Time `json:"asked_at"`
 	RemindedAt time.Time `json:"reminded_at,omitzero"`
 	AcceptedAt time.Time `json:"accepted_at,omitzero"`
+	// BySupervisor: passed by the task's supervisor, whose task_review accepted it having checked the evidence, not by
+	// the owner (supervisorVerified, #3240).
+	BySupervisor bool `json:"by_supervisor,omitempty"`
 	// NoCard: no card is due (the bot is off or not paired, or task reports are off, when the ask was made or when its
 	// card was tried again), or its card could not be posted within acceptPostWindow, so MessageID stays empty for good;
 	// the owner is asked by the briefing, the board and the web app instead. An empty MessageID without it (and with
@@ -158,6 +161,9 @@ var urlRe = lazyre.New(`https?://[^\s<>()\[\]"'，。；、）]+`)
 func (s *Service) askAcceptance(t Todo, machine, session, reply string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
+	if cur, ok := s.todoNow(t.ID); ok && supervisorVerified(cur) {
+		return // its supervisor checked it and accepted it already: nothing to ask the owner (#3240)
+	}
 	b := &s.accept
 	b.mu.Lock()
 	if !s.loadAcceptLocked(ctx) {
@@ -179,6 +185,91 @@ func (s *Service) askAcceptance(t Todo, machine, session, reply string) {
 	a := s.acceptLines(ctx, t, machine, session, reply)
 	a.MachineID, a.SessionID, a.AskedAt, a.Earlier = machine, session, time.Now().UTC(), earlier
 	s.postAsk(ctx, t, a)
+	// The supervisor may have accepted it while the ask was made: task_review found only a claim then, so it is passed here.
+	if cur, ok := s.todoNow(t.ID); ok && supervisorVerified(cur) {
+		if _, err := s.verifyBySupervisor(ctx, t.ID); err != nil {
+			s.logf("task %s: supervisor verify: %v", t.ID, err)
+		}
+	}
+}
+
+// supervisorVerified says task t's supervisor (the main conversation or a leader) closed it with task_review accepted,
+// having checked its evidence, and did not ask the owner to look themselves (user_check): its "Please verify" is the
+// supervisor's to pass, not the owner's (#3240). A task with no supervisor, or one the done judge closed, still asks.
+func supervisorVerified(t Todo) bool {
+	v := t.Supervision
+	if v == nil || v.Supervisor == "" || v.state(t) != reviewAccepted || len(v.Reviews) == 0 {
+		return false
+	}
+	r := v.Reviews[len(v.Reviews)-1]
+	return r.Verdict == reviewAccepted && r.By == "" && !r.UserCheck
+}
+
+// verifyBySupervisor passes task id's "Please verify" for its supervisor, as the owner's "Pass" would (the task is
+// verified, its cards say who passed it), and so a done or cannot conclusion its owner was to acknowledge; false when
+// there is none waiting (a decision, a claim still going out, one passed already or from before the latest reopen).
+// errAcceptStore: the asks could not be read or saved.
+func (s *Service) verifyBySupervisor(ctx context.Context, id string) (bool, error) {
+	t, todoOK := s.todoNow(id)
+	b := &s.accept
+	b.mu.Lock()
+	if !s.loadAcceptLocked(ctx) {
+		b.mu.Unlock()
+		return false, errAcceptStore
+	}
+	a, ok := b.asks[id]
+	if !ok || decideAsk(a) || a.AskedAt.IsZero() || !a.AcceptedAt.IsZero() || todoOK && acceptAskStale(a, t) {
+		b.mu.Unlock()
+		return false, nil
+	}
+	a.AcceptedAt, a.BySupervisor = time.Now().UTC(), true
+	if err := s.saveAcceptErrLocked(ctx); err != nil {
+		a.AcceptedAt, a.BySupervisor = time.Time{}, false
+		b.mu.Unlock()
+		return false, fmt.Errorf("%w: %w", errAcceptStore, err)
+	}
+	cp := *a
+	b.mu.Unlock()
+	s.askChanged(ctx)
+	if cp.Conclusion {
+		s.updateAskCards(ctx, id, cp) // "verified" is for deployed work: a conclusion's card only says it is checked
+	} else {
+		s.taskVerified(ctx, id, cp)
+	}
+	return true, nil
+}
+
+// verifySupervisedAsks passes every "Please verify" or done conclusion still waiting whose task its supervisor accepted
+// (supervisorVerified): the ones asked before #3240, and any a race left behind.
+func (s *Service) verifySupervisedAsks(ctx context.Context) {
+	if err := s.ensureTodosLoaded(ctx); err != nil {
+		s.logf("acceptance: supervisor verify: %v", err)
+		return
+	}
+	b := &s.accept
+	b.mu.Lock()
+	if !s.loadAcceptLocked(ctx) {
+		b.mu.Unlock()
+		return
+	}
+	var ids []string
+	for id, a := range b.asks {
+		if !decideAsk(a) && !a.AskedAt.IsZero() && a.AcceptedAt.IsZero() {
+			ids = append(ids, id)
+		}
+	}
+	b.mu.Unlock()
+	slices.Sort(ids)
+	for _, id := range ids {
+		if t, ok := s.todoNow(id); !ok || !supervisorVerified(t) {
+			continue
+		}
+		if ok, err := s.verifyBySupervisor(ctx, id); err != nil {
+			s.logf("task %s: supervisor verify: %v", id, err)
+		} else if ok {
+			s.logf("task %s: its \"Please verify\" passed by its supervisor's acceptance", id)
+		}
+	}
 }
 
 // postAsk posts the card of ask a, which task t claimed in the book, when the bot can, and keeps a in the claim's place;
@@ -276,7 +367,7 @@ func (s *Service) acceptCard(ctx context.Context, t Todo, a acceptAsk, again boo
 	c.Markdown(i18n.T(l, "assistant-reports.accept_lines", i18n.Args{"changed": feishubot.EscapeMarkdown(a.Changed), "link": link,
 		"how": feishubot.EscapeMarkdown(a.How)}))
 	if !a.AcceptedAt.IsZero() {
-		return c.Note(i18n.T(l, "assistant-reports.accepted"))
+		return c.Note(acceptedNote(l, &a))
 	}
 	bs := []feishubot.Button{feishubot.Btn(i18n.T(l, "assistant-reports.accept_pass"), feishubot.Primary, map[string]any{"a": "accept", "id": t.ID})}
 	if a.Link != "" {
@@ -496,6 +587,10 @@ func (s *Service) acceptTryAs(ctx context.Context, id, card string, byDefault bo
 	cp := *a
 	b.mu.Unlock()
 	s.askChanged(ctx) // it no longer waits
+	if !decideAsk(&cp) && !cp.Conclusion {
+		s.taskVerified(ctx, id, cp)
+		return true, nil
+	}
 	switch {
 	case decideAsk(&cp):
 		if err := s.takeRecommendation(ctx, id, cp); err != nil {
@@ -513,19 +608,31 @@ func (s *Service) acceptTryAs(ctx context.Context, id, card string, byDefault bo
 		}
 	case cp.Conclusion:
 		// Seen: the review already closed the task and told where it came from; "verified" is for deployed work.
-	default:
-		s.setTaskStage(ctx, id, "verify", "")
-		s.threadPost(id, threadEvent{kind: threadTodoAccepted}) // and the todo's chat thread
-		s.sourceReportSoon(id, sourceReportWait)                // and where the request came from (todo_source.go)
 	}
-	if t, ok := s.todoNow(id); ok {
-		for _, mid := range cp.Messages {
-			if err := s.botUpdateCard(ctx, mid, s.acceptCard(ctx, t, cp, false)); err != nil {
-				s.logf("task %s: acceptance card: %v", id, err)
-			}
+	s.updateAskCards(ctx, id, cp)
+	return true, nil
+}
+
+// taskVerified is what follows deployed task id's "Please verify" a passed (by the owner or its supervisor): the task is
+// verified, its todo's chat thread and where the request came from hear it, and its cards say so.
+func (s *Service) taskVerified(ctx context.Context, id string, a acceptAsk) {
+	s.setTaskStage(ctx, id, "verify", "")
+	s.threadPost(id, threadEvent{kind: threadTodoAccepted}) // and the todo's chat thread
+	s.sourceReportSoon(id, sourceReportWait)                // and where the request came from (todo_source.go)
+	s.updateAskCards(ctx, id, a)
+}
+
+// updateAskCards redraws every card of task id's ask a as it is now.
+func (s *Service) updateAskCards(ctx context.Context, id string, a acceptAsk) {
+	t, ok := s.todoNow(id)
+	if !ok {
+		return
+	}
+	for _, mid := range a.Messages {
+		if err := s.botUpdateCard(ctx, mid, s.acceptCard(ctx, t, a, false)); err != nil {
+			s.logf("task %s: acceptance card: %v", id, err)
 		}
 	}
-	return true, nil
 }
 
 // acceptLoop posts the cards that did not go out when their ask was made (retryAcceptance), and again, each morning, the
@@ -535,6 +642,7 @@ func (s *Service) acceptLoop(ctx context.Context) {
 	defer tick.Stop()
 	due := time.NewTicker(decisionSweepEvery) // decisions past their deadline (decision_deadline.go)
 	defer due.Stop()
+	s.verifySupervisedAsks(ctx) // the asks its supervisor passed while this hub was older (#3240)
 	for {
 		select {
 		case <-ctx.Done():
@@ -543,6 +651,7 @@ func (s *Service) acceptLoop(ctx context.Context) {
 			s.goSweepDecisionDeadlines(time.Now())
 		case <-tick.C:
 			now := time.Now()
+			s.verifySupervisedAsks(ctx)
 			s.retryAcceptance(now)
 			s.remindAcceptance(now)
 		}
