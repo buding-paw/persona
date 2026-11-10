@@ -3,7 +3,9 @@ package assistant
 import (
 	"cmp"
 	"context"
+	"slices"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -72,7 +74,7 @@ func (s *Service) contextSnapshot(ctx context.Context) string {
 	out := *snap
 	out.Now = time.Now().In(s.location(ctx))
 	out.ModelProfile = s.modelProfileContext(ctx)
-	return prompts.RenderSnapshot(out)
+	return fitSnapshot(&out)
 }
 
 const (
@@ -80,7 +82,77 @@ const (
 	snapshotWait    = 1500 * time.Millisecond
 	snapshotStale   = 30 * time.Minute
 	snapshotSlowest = 5 * time.Second
+
+	// snapshotBudget: characters of rendered snapshot one message may carry (#3203). It goes to every message, so its
+	// size is paid again on each of the turn's tool calls; past it the sections below are dropped in that order.
+	// A range of a few kilobytes keeps what the assistant needs to answer and leaves the rest to the tools.
+	snapshotBudget = 6000
+	// snapshotLine: characters one free-text line keeps (an agent's last line, what a task is doing, a conclusion).
+	snapshotLine = 220
 )
+
+// fitSnapshot trims out until the rendered snapshot fits snapshotBudget: first every free-text line, then whole
+// sections from the least to the most needed, whose counts stay in the header lines. The assistant can always ask
+// the tools (agents_list, inbox, todo_list) for what was dropped.
+func fitSnapshot(s *prompts.Snapshot) string {
+	trimAgent := func(in []prompts.SnapshotAgent) []prompts.SnapshotAgent {
+		out := slices.Clone(in)
+		for i := range out {
+			out[i].Line = clip(out[i].Line, snapshotLine)
+		}
+		return out
+	}
+	s.Needs, s.Unread, s.Awaiting, s.Waiting, s.Done = trimAgent(s.Needs), trimAgent(s.Unread), trimAgent(s.Awaiting),
+		trimAgent(s.Waiting), trimAgent(s.Done)
+	for i := range s.Tasks {
+		s.Tasks[i].Last = clip(s.Tasks[i].Last, snapshotLine)
+		s.Tasks[i].Doing = clip(s.Tasks[i].Doing, snapshotLine)
+	}
+	for i := range s.Unaccepted {
+		s.Unaccepted[i].Verdict = clip(s.Unaccepted[i].Verdict, snapshotLine)
+		s.Unaccepted[i].Changed = clip(s.Unaccepted[i].Changed, snapshotLine)
+	}
+	if text := prompts.RenderSnapshot(*s); len(text) <= snapshotBudget {
+		return text
+	}
+	for _, drop := range []func(*prompts.Snapshot){
+		func(s *prompts.Snapshot) { s.Muted = nil },
+		func(s *prompts.Snapshot) { s.Done = nil },
+		func(s *prompts.Snapshot) { s.Routines, s.RoutinesTotal = nil, 0 },
+		func(s *prompts.Snapshot) { s.Followups = nil },
+		func(s *prompts.Snapshot) { s.Plans, s.PlansTotal = nil, 0 },
+		func(s *prompts.Snapshot) { s.Asked = nil },
+		func(s *prompts.Snapshot) { s.KB = "" },
+		func(s *prompts.Snapshot) {
+			if s.Chats != nil {
+				chats := *s.Chats
+				chats.Other = nil
+				s.Chats = &chats
+			}
+		},
+		func(s *prompts.Snapshot) { s.Working = nil },
+		func(s *prompts.Snapshot) { s.Unaccepted, s.UnacceptedTotal = nil, 0 },
+		func(s *prompts.Snapshot) { s.Tasks = nil },
+		func(s *prompts.Snapshot) { s.Unread = nil },
+		func(s *prompts.Snapshot) { s.Approvals = nil },
+	} {
+		if text := prompts.RenderSnapshot(*s); len(text) <= snapshotBudget {
+			return text
+		}
+		drop(s)
+	}
+	return clipSnapshot(prompts.RenderSnapshot(*s))
+}
+
+// clipSnapshot is text cut at a line break to the budget, with a line saying where the rest is: a section the drops
+// above cannot shorten (a long list of agents waiting for the user) must not push the block past it.
+func clipSnapshot(text string) string {
+	head := text
+	if cut := strings.LastIndexByte(text[:snapshotBudget], '\n'); cut > 0 {
+		head = text[:cut]
+	}
+	return head + "\n- 快照到此截断；其余用 agents_list、todo_list、inbox 查"
+}
 
 // takeSnapshot reads the sources and keeps the result for contextSnapshot; done is closed when it is in.
 func (s *Service) takeSnapshot(done chan struct{}) {
