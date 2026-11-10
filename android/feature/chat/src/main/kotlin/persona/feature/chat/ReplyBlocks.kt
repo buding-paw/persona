@@ -40,6 +40,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.isSpecified
 import com.mikepenz.markdown.model.MarkdownAnnotator
 import com.mikepenz.markdown.model.markdownAnnotator
@@ -111,7 +112,11 @@ private fun ASTNode.inLink(): Boolean {
 internal fun copyingCode(style: SpanStyle, copy: (String) -> Unit): MarkdownAnnotator = markdownAnnotator { content, child ->
     if (child.type != MarkdownElementTypes.CODE_SPAN || child.inLink()) return@markdownAnnotator false
     val words = codeSpanWords(child.getTextInNode(content).toString())
-    withLink(LinkAnnotation.Clickable("copy-code", TextLinkStyles(style)) { copy(words) }) { append(words) }
+    // the style on the words themselves too: a link's styles draw no background. A thin space each side, as the
+    // library pads its own inline code.
+    withLink(LinkAnnotation.Clickable("copy-code", TextLinkStyles(style)) { copy(words) }) {
+        withStyle(style) { append("\u2009$words\u2009") }
+    }
     true
 }
 
