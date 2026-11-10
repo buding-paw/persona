@@ -1,6 +1,98 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ can't share its clipboard.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ can't share its clipboard."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ はクリップボードを共有できません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 不能共享剪贴板。"
+          }
+        }
+      }
+    },
+    "%@ can't share its clipboard: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ can't share its clipboard: %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ はクリップボードを共有できません：%2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 不能共享剪贴板：%2$@"
+          }
+        }
+      }
+    },
+    "%@ couldn't use its clipboard. Try again.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ couldn't use its clipboard. Try again."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ はクリップボードを読み書きできませんでした。もう一度お試しください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 读写剪贴板失败，请再试一次。"
+          }
+        }
+      }
+    },
+    "%@ couldn't use its clipboard: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ couldn't use its clipboard: %2$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ はクリップボードを読み書きできませんでした：%2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 读写剪贴板失败：%2$@"
+          }
+        }
+      }
+    },
     "A call or another app paused the recording. Open Persona to continue it." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -112,6 +204,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "日历：%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Clipboard sharing is off for %@. Turn it on on the computer's page in Persona.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clipboard sharing is off for %1$@. Turn it on on the computer's page in Persona."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ではクリップボード共有がオフです。Persona のこのコンピュータのページでオンにしてください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 没有打开剪贴板共享，请在 Persona 里这台电脑的页面上打开。"
+          }
+        }
+      }
+    },
+    "Clipboard sharing isn't available on this operating system.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clipboard sharing isn't available on this operating system."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このオペレーティングシステムではクリップボード共有を使えません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个操作系统暂不支持剪贴板共享。"
           }
         }
       }
@@ -649,6 +787,29 @@
         "ja": { "stringUnit": { "state": "translated", "value": "削除待ちの内容は、まだナレッジから削除されていません。" } }
       }
     },
+    "Persona Link runs outside the desktop session on this computer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persona Link runs outside the desktop session on this computer."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このコンピュータの Persona Link はデスクトップセッションの外で動いています。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台电脑上的 Persona Link 运行在桌面会话之外。"
+          }
+        }
+      }
+    },
     "Record a Meeting" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1055,6 +1216,75 @@
         "ja": { "stringUnit": { "state": "translated", "value": "サービスがこの要求を完了できませんでした。しばらくしてから再試行してください。（HTTP %1$lld）" } }
       }
     },
+    "This computer has no clipboard tool installed (wl-clipboard or xclip).": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This computer has no clipboard tool installed (wl-clipboard or xclip)."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このコンピュータにはクリップボードツール（wl-clipboard または xclip）がインストールされていません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台电脑没有安装剪贴板工具（wl-clipboard 或 xclip）。"
+          }
+        }
+      }
+    },
+    "This computer has no desktop session, so it has no clipboard.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This computer has no desktop session, so it has no clipboard."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このコンピュータにはデスクトップセッションがないため、クリップボードがありません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台电脑没有桌面会话，所以没有剪贴板。"
+          }
+        }
+      }
+    },
+    "This device can't use clipboard sharing. Use your phone or a signed-in computer.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device can't use clipboard sharing. Use your phone or a signed-in computer."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスではクリップボード共有を使えません。スマートフォンかサインイン済みのコンピュータを使ってください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台设备不能使用剪贴板共享，请用手机或已登录的电脑。"
+          }
+        }
+      }
+    },
     "This hub doesn't write meeting minutes yet. They come after it's updated." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1074,6 +1304,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这台 hub 还不会整理会议纪要，更新后就有了。"
+          }
+        }
+      }
+    },
+    "This image couldn't be read. Copy it again, or save it and send it as a file.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This image couldn't be read. Copy it again, or save it and send it as a file."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この画像を読み取れませんでした。もう一度コピーするか、保存してファイルとして送ってください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这张图片读不出来。请重新复制，或者保存后作为文件发送。"
           }
         }
       }
@@ -1104,6 +1357,52 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "待开始"
+          }
+        }
+      }
+    },
+    "Too large to send: text up to 4 MB, images up to 7 MB.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too large to send: text up to 4 MB, images up to 7 MB."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "大きすぎて送信できません。テキストは 4 MB、画像は 7 MB までです。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "内容太大，发不了：文字最多 4 MB，图片最多 7 MB。"
+          }
+        }
+      }
+    },
+    "Update Persona Link on this computer to share its clipboard.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update Persona Link on this computer to share its clipboard."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリップボードを共有するには、このコンピュータの Persona Link をアップデートしてください。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新这台电脑上的 Persona Link 后才能共享剪贴板。"
           }
         }
       }
