@@ -192,7 +192,13 @@ struct ClipboardSection: View {
     }
 
     private func report(_ outcome: ClipboardOutcome) {
+        Self.report(outcome, machine: machine.name, ref: ref, app: app)
+    }
+
+    /// A result as a toast; a send remembers the computer, offered first next time (`ClipboardOffer`).
+    static func report(_ outcome: ClipboardOutcome, machine name: String, ref: MachineRef, app: AppModel) {
         if outcome.isFailure { Haptics.error() } else { Haptics.success() }
-        app.toast = Toast(outcome.message(machine: machine.name), style: outcome.isFailure ? .error : .success)
+        if case .sent = outcome { UserDefaults.standard.set(ref.path, forKey: ClipboardOffer.lastMachineKey) }
+        app.toast = Toast(outcome.message(machine: name), style: outcome.isFailure ? .error : .success)
     }
 }

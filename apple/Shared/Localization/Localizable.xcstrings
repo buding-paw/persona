@@ -1009,6 +1009,29 @@
         }
       }
     },
+    "Offer to Send What You Copied": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offer to Send What You Copied"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "戻ったときにコピー内容の送信を提案"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "回到 App 时提示发送剪贴板"
+          }
+        }
+      }
+    },
     "Open Questions" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1325,6 +1348,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "发送剪贴板"
+          }
+        }
+      }
+    },
+    "Send what you just copied to %@?": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send what you just copied to %1$@?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コピーした内容を %1$@ に送りますか？"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "把刚复制的内容发到 %1$@？"
           }
         }
       }
@@ -1794,6 +1840,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "更新这台电脑上的 Persona Link 后才能共享剪贴板。"
+          }
+        }
+      }
+    },
+    "When you come back to Persona after copying something, offers to send it to a computer that shares its clipboard. The clipboard is read only when you tap Send.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When you come back to Persona after copying something, offers to send it to a computer that shares its clipboard. The clipboard is read only when you tap Send."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ほかの場所でコピーして Persona に戻ったとき、クリップボードを共有しているコンピュータへ送るよう提案します。クリップボードは「送信」をタップしたときだけ読み取ります。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在别处复制了内容再回到 Persona 时，提示把它发到打开了剪贴板共享的电脑。只有点「发送」时才会读取剪贴板。"
           }
         }
       }
