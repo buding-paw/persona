@@ -11,21 +11,21 @@ import (
 )
 
 // oldNotify is the line Notify wrote before it took encoded params as they are: params encoded, then the envelope,
-// then the newline.
+// then the newline, each by an encoder that leaves HTML characters as they are.
 func oldNotify(event string, params any) ([]byte, error) {
-	raw, err := json.Marshal(params)
-	if err != nil {
+	var p bytes.Buffer
+	if err := plainEncoder(&p).Encode(params); err != nil {
 		return nil, err
 	}
-	b, err := json.Marshal(message{Event: event, Params: raw})
-	if err != nil {
+	var b bytes.Buffer
+	if err := plainEncoder(&b).Encode(message{Event: event, Params: bytes.TrimSuffix(p.Bytes(), []byte("\n"))}); err != nil {
 		return nil, err
 	}
-	return append(b, '\n'), nil
+	return b.Bytes(), nil
 }
 
-// Encoded params go out exactly as when they were encoded once more: HTML characters and U+2028 escaped, whitespace
-// dropped, and the same error for ones that are not JSON (nothing written).
+// Encoded params go out exactly as when they were encoded once more: HTML characters and escapes as they are, U+2028
+// escaped, whitespace dropped, and the same error for ones that are not JSON (nothing written).
 func TestNotifyRawIsTheSameLine(t *testing.T) {
 	for _, params := range []any{
 		json.RawMessage(`{"html":"<a href='x'>&amp;</a>","sep":"\u2028\u2029   "}`),
@@ -82,7 +82,7 @@ func TestNotifyRawAllocates(t *testing.T) {
 		}
 	}
 	runtime.ReadMemStats(&after)
-	// The line is 360,744 bytes (its HTML characters escaped); it was 721,168.
+	// The line is 266,301 bytes (360,744 with its HTML characters escaped); it was 721,168.
 	if per := (after.TotalAlloc - before.TotalAlloc) / runs; per > 371566 && !raceEnabled {
 		t.Errorf("a Notify of %d encoded bytes allocated %d bytes, want at most 371566", len(raw), per)
 	}
