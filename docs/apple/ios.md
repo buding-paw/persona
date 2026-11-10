@@ -46,6 +46,11 @@ Chat page:
   Background slices extend halfway into spacing (`WorkCardSlice.bridge = Theme.Space.l / 2`): the old hard-coded 7 for 14pt spacing left 2pt white seams after spacing changed to 16.
 - One `DiffView` (Claude Edit / MultiEdit / Write supplies old/new text; Codex unified diff), sharing Git row models (`DiffText.Line` / `parse`):
   header filename, directory, +N −N (opens file); only ± and row backgrounds are colored, code uses body color; long lines scroll horizontally with right fade; beyond 40 lines show beginning + Expand all.
+  Old/new text is compared in PersonaKit's `LineDiff` (#2915, a Myers line diff like the web's `compare.ts`): unchanged lines stay as plain context, two or more in a row that are over 3 lines
+  from any change fold into one "… N unchanged lines" row until Show All (which opens through `toggleInPlace`, the diff's top pinned), and a removed line paired with the added one after it (first with first) marks its changed words on
+  `Theme.Diff.addEmphasis` / `delEmphasis` (words as in the web's `code-review.ts`: ≤ 1,000 characters, ≤ 500 words, similar enough; Han and kana count one character per word).
+  Every +N −N (header, tool chip, changed files) is that diff's. Past its budget (1,000 lines between the common start and end, 100,000 characters a side) the middle is all removed, then all added.
+  A newline ending both texts (or a Write's content) ends the last line, as git counts; ending only one of an Edit's texts (pieces of a file), it is a line break put in or taken out and shows as an empty line added or removed.
   Whole-file Git diffs still use `MonoTextView` for large-diff performance, same models and colors. Tool failures put Error above output instead of covering its first line.
 - Image viewer: every full-image entry in the App (chat images, sent images, images viewed this turn, tool results, Files images, notebook outputs, Markdown web images and diagrams,
   Lark messages / cards / Moments / documents, Inbox connector messages, Lark attachments) uses one `ImageViewer` (`ImageViewer.swift`, `ViewerImage` data:
@@ -164,11 +169,11 @@ Chat page:
     Mac `NSClipView` clamps beyond-latest offsets on layout, so glide manually sets each frame and restores any displacement in the same layout (`ChatPin+Mac.swift`).
     Tapping thinking/tools/BeautifulUI tool-pill groups within open work keeps both title and tapped row still (no borrowing remaining title rise or replacing persistent hold with normal 1.5 s).
     Reduce Motion disables rise/glide and content fades (`Theme.Motion.reduced`, #1123).
-  - Background tasks wake idle Claude (`wake` notice): still the same turn, not split. Wake-ups divide it into segments ending with Agent text;
-    the answer is the latest segment's text, so the chat always ends on the newest words (`Turn.pickAnswerAcrossWakes`, #3783; it used to be the longest, and a short reply after a wake showed while streaming, then went into the drawer once its item landed: Summary → Build uploaded now ends on Build uploaded, Summary in the work row).
-    Everything before the answer (transitional text, wake itself counted as a tool) folds into one work row; after it a small "🔔 Background command finished · <description> ›" strip, not inline expansion,
-    opens bottom `WakeDrawer` showing only results: each task notice and Agent reply in order, intermediate tools/thinking/text folded into one final work row by default (requested 2026-10-31: expanding should not unfold N process segments). While still handling a wake, strip says Background task finished · Processing.
-    Tasks completing during work (not waking) remain a work step.
+  - Background tasks wake idle Claude (`wake` notice): still the same turn, not split. The latest Agent text after a
+    wake is the answer, so the chat always ends on the newest words (`Turn.pickAnswerAcrossWakes`, #3783). Before new
+    words arrive, the previous answer stays in place while the new work joins its execution summary instead of opening
+    a second segment (#2796). Everything before the answer, including wake notices and intermediate narration, stays
+    inspectable by opening that ordinary work row. Tasks completing during work (not waking) remain a work step.
     Pitfall: Claude Code's idle-session away recap closes the turn; a later wake must reopen and merge into it,
     keeping recap in place, or post-wake replies show directly (`ChatBlock.build` `lastRaw` / `reopenedAt`).
   - Away recaps resemble background tasks: small "↺ Away recap · 21 min ago ›" strip opens `RecapCard` / `RecapDrawer` with full text. Consecutive recaps with nothing between merge into "↺ Away recap · 3 times · 3 min ago ›", newest first in drawer (`ChatLines.foldRecaps`, requested 2026-10-31); mock `MOCK_RECAPS=1`.
@@ -355,7 +360,10 @@ Chat page:
     order ctrl+alt+shift+key, herdr encodes (ctrl+shift+a CSI u), unknown names reject entire chord (`invalid_key`); serial sends preserve press order.
     Live-status terminal icon opens full-screen version of same panel.
   - Git (`GitPane`): branch, upstream ↑↓ (an upstream deleted on the remote, `gone`, says so and has no Pull), staged count; changes (status letter, +/− lines, staged/partially staged), diff with old/new numbers and red/green, no wrap, horizontal scroll,
-    staged/unstaged switch when both; paged history, commit message and per-file diffs.
+    staged/unstaged switch when both; paged history, commit message and per-file diffs. A refresh the user asked for (pull to refresh, the Mac's
+    Refresh / ⌘R) that fails over a status already shown says so in a notice above it with Retry, and a failed Load Earlier Commits turns the button
+    into "Couldn't load. Try again." (#1889, `GitReadFailure`); only the automatic live refresh stays quiet. Screenshots: mock hub `MOCK_GIT_READ_FAIL=1`
+    with `-showGitReload YES`.
     Branch-card Pull N fetches latest upstream in one tap, retained as Pull when synced for active remote checks; disable repeat taps while running, refresh status/files/history and show result.
     Clean-worktree fast-forward only, no auto stash/merge/rebase; existing stashes unchanged; explain no upstream/detached HEAD/uncommitted changes/divergence. Other Git views stay read-only.
   - Files (`FilesPane`): descend from session cwd, breadcrumbs jump levels, directories first, size/modification/Git flags (dot for changes within directory),
@@ -1335,7 +1343,7 @@ When a device cannot reach the hub address, connect through an SSH server. For t
 - **Code**: the tunnel itself is in the shared package `apple/Packages/PersonaSSH` (swift-nio-ssh + Network.framework, shared by iOS and Mac, not linked into the watch);
   App-side `Persona/App/SSHTunnels.swift` (one tunnel per hub, `SSHKeys`, routing `AppModel.sshRoute`),
   `Shared/HubTransport.swift` (maps hub addresses to tunnel loopback addresses, `SSHRoute` configuration), `Persona/Views/Settings/SSHTunnelView.swift`.
-- **Only outgoing URLs change**: `APIClient.url`, chat-item URLs, `LiveConnection` sockets and port-forwarding address construction pass through `HubTransport.resolve`;
+- **Only outgoing URLs change**: `APIClient.url`, chat-item URLs, `LiveConnection` sockets, port-forwarding address construction and the Feishu video and voice player's stream URL (`LarkMedia.streamURL`) pass through `HubTransport.resolve`;
   `ServerConfig`, the pairing registry, `currentConfig` and all comparisons still use the hub's own address, so multi-hub grouping, routing and credential upgrades need no tunnel awareness.
   `HubRoute.healthProbe` uses `direct: true`, always probing the direct route.
 - **Routing**: with usable SSH settings in a group (host, user, confirmed fingerprint), `routePicker` always has a value: before every connection, `HubRoute.answering` probes direct routes (even a single address),

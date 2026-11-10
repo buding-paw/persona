@@ -44,6 +44,11 @@ from colliding with its buttons.
   the screen drew it over the bar and hid the bar's buttons; it starts at `AssistantTopBar.fogSolid`, the bar fog's solid end, and goes
   down from there. The bar, the shell's moving bar and the switcher share `fogSolid` and `fade` so they cannot drift apart.
 
+## Personal Agent entry availability (#2935)
+
+- Gate entry points on source setup, configured accounts and an unfiltered session list, not the personal page's search/unread preferences. Unknown availability starts hidden; a source/account response alone cannot reveal the chip. Keep an event listener alive while the Agents tab is visible so the first session can reveal a previously hidden entry, and fence cancelled reads and changed hub credentials.
+- A mock returning sessions with `sources: []` is not a configured fixture. Entry and remove UI tests use `MOCK_PERSONAL_AGENTS=1` and `TEST_RUNNER_PERSONA_PERSONAL_HUB`; `/mock/personal-agents?state=configured|empty|missing|disabled|no_accounts` changes availability and broadcasts an `agents` event. Native preference captures need a configured source too: `MOCK_PERSONAL_UPGRADE=1` supplies the named conversation and leaves preferences at 404. A capture with a synthetic pairing does not by itself prove an old-to-new upgrade; preserve old-build state for that separate acceptance.
+
 ## Pages that move sideways under iPhone Duo's side bars (#2752)
 
 - Under iPhone Duo's vertical bars (the outer display, the inner one on its side), a view that hosts a `UINavigationController` and moves sideways makes the controller run its deferred transition on every layout pass and lay its top view controller out twice (`transitionConductor:didStartDeferredTransition:context:` → `_layoutTopViewControllerLookForNested:`, then `_computeAndApplyScrollContentInsetDeltaForViewController:` → `_updateTopViewFramesToMatchScrollOffsetInViewController:…`). The shell's slide between Assistant and Agents spent 28 ms a frame (p95), 140 ms of hitches a second. An `offset`, a render-only `transformEffect` and a page under a mask all cost the same; only not moving helps (`ShellPageSlide` cross-fades there). An ordinary iPhone runs the same passes cheaply, so measure on the Duo simulator.
@@ -1565,3 +1570,21 @@ A worktree's display name and its Agents' conversation names are different comma
   `FleetIntentsTests.sayingYesNeedsUnlock`). The policy covers the whole intent, so its other replies wait for the unlock too.
   Ask Claude and Give an Agent a Task still send messages from a locked phone; changing that is a separate decision.
 - An entry that never shows the plan in full approves plans in `acceptEdits`, never `bypassPermissions`.
+
+## `difference(from:)` can need memory in the square of the changes (2026-11-10, #2915)
+
+- The standard library's Myers diff keeps every step's frontier in the older runtimes: on macOS 15.6, two sides of
+  2,000 lines that share none took the process to 67 MB, of 4,000 lines to 290 MB (of 500 lines: 6 MB). iOS devices before 26.4
+  are expected to behave the same.
+- Never hand it a whole file or an unbounded input from a view or a memo. `LineDiff` (PersonaKit) sets the lines both
+  sides start and end with aside first (a typical edit leaves a few lines to compare), maps lines to integers, and above
+  1,000 lines in between draws them as removed then added instead. `TextCompare` (document versions) caps each side at
+  20,000 lines only, far more than a phone has memory for when two big versions share little; not changed yet.
+
+## A read the user asked for must say when it fails (2026-11-10, #1889)
+
+- The Git tab's load paths kept a failure quiet once a status was shown (`if status == nil && !live`), and Load Earlier
+  Commits used `try?`: a pull to refresh or ⌘R over a stale status, or a failed page of history, looked exactly like
+  "nothing new" or "no earlier commits". Keep the quiet path only for the automatic live refresh; a read the user started
+  says it failed over what stays shown (a notice with Retry, or the button itself turning into Try Again). Decide it in a
+  small pure type (`GitReadFailure`) so a test pins which case is quiet.
