@@ -228,6 +228,7 @@ func parseCodexLine(seq int, line []byte, meta *Meta) []proto.Item {
 		meta.codexTurnID, meta.codexUserID = p.TurnID, ""
 		meta.clearTurnError()
 		meta.turnWorked = false
+		meta.codexSeen = nil // an item repeats only within its turn: a long rollout keeps no ids of the turns before
 		return nil
 	case "task_complete":
 		meta.TurnOpen, meta.TurnClosed = false, true
