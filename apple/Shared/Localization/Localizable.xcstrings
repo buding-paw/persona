@@ -423,6 +423,52 @@
         "ja": { "stringUnit": { "state": "translated", "value": "このデバイスから削除しました。ナレッジからの削除はまだ同期待ちの可能性があります。" } }
       }
     },
+    "Get Clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get Clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリップボードを取得"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取回剪贴板"
+          }
+        }
+      }
+    },
+    "Image from the computer's clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image from the computer's clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コンピュータのクリップボードの画像"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "电脑剪贴板里的图片"
+          }
+        }
+      }
+    },
     "Image sent to %@'s clipboard": {
       "extractionState": "manual",
       "localizations": {
@@ -802,6 +848,52 @@
         }
       }
     },
+    "Not available on this computer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not available on this computer"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このコンピュータでは使えません"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台电脑用不了"
+          }
+        }
+      }
+    },
+    "Not available: %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not available: %1$@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使えません：%1$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用不了：%1$@"
+          }
+        }
+      }
+    },
     "Nothing to note: no points, decisions or action items came up." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -844,6 +936,52 @@
           "stringUnit": {
             "state": "translated",
             "value": "没有可发送的内容：剪贴板是空的，或者没有允许粘贴"
+          }
+        }
+      }
+    },
+    "Now on this phone's clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Now on this phone's clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このスマートフォンのクリップボードにあります"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已在手机剪贴板上"
+          }
+        }
+      }
+    },
+    "Off by default. When on, you can send this phone's clipboard to this computer and get the computer's here. Nothing is kept on the hub.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off by default. When on, you can send this phone's clipboard to this computer and get the computer's here. Nothing is kept on the hub."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "既定ではオフです。オンにすると、このスマートフォンのクリップボードをこのコンピュータに送ったり、コンピュータのクリップボードをここに取り込んだりできます。内容は hub に残りません。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "默认关闭。打开后，可以把手机的剪贴板发到这台电脑，也能把电脑的剪贴板取到手机上；内容不会留在 hub 上。"
           }
         }
       }
@@ -1145,6 +1283,52 @@
         }
       }
     },
+    "Send Clipboard": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send Clipboard"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "クリップボードを送信"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送剪贴板"
+          }
+        }
+      }
+    },
+    "Sends without the paste prompt": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sends without the paste prompt"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペーストの確認なしで送信"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直接发送，不弹粘贴确认"
+          }
+        }
+      }
+    },
     "Sent to %@'s clipboard": {
       "extractionState": "manual",
       "localizations": {
@@ -1164,6 +1348,29 @@
           "stringUnit": {
             "state": "translated",
             "value": "已发到 %1$@ 的剪贴板"
+          }
+        }
+      }
+    },
+    "Share Clipboard with Phone": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share Clipboard with Phone"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スマートフォンとクリップボードを共有"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与手机互传剪贴板"
           }
         }
       }
