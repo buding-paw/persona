@@ -763,8 +763,11 @@ targets:
       - path: PersonaTests/ExtensionSettingsLifecycleTests.swift
       - path: PersonaTests/ExtensionUpgradeTests.swift
       - path: PersonaTests/DelegateTests.swift
+      - path: PersonaTests/GitReadFailureTests.swift
       - path: PersonaTests/ChatSupervisionLinesTests.swift
       - path: PersonaTests/SupervisionTests.swift
+      - path: PersonaTests/BriefCardTests.swift
+      - path: PersonaTests/TodoDecisionCompletionTests.swift
       - path: PersonaTests/FakeHub.swift
     dependencies:
       - target: PersonaMac
