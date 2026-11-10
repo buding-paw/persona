@@ -208,6 +208,29 @@
         }
       }
     },
+    "Asked every time? In Settings, set Paste from Other Apps to Allow.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asked every time? In Settings, set Paste from Other Apps to Allow."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "毎回確認されますか？設定で「ほかのAppからペースト」を「許可」にできます"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每次都要确认？可在设置里把「从其他 App 粘贴」改成「允许」"
+          }
+        }
+      }
+    },
     "Attendees: %@" : {
       "extractionState" : "manual",
       "localizations" : {

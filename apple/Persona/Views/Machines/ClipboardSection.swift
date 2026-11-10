@@ -2,7 +2,8 @@ import SwiftUI
 
 /// Clipboard on a computer's page (#3064), while its hub reports clipboard support: the per-computer switch (off by
 /// default), then Send Clipboard (reads the phone's; iOS may ask "Allow Paste?"), the system Paste button beside it (no
-/// prompt), and Get Clipboard (the computer's onto the phone, shown below).
+/// prompt), and Get Clipboard (the computer's onto the phone, shown below). After the first paste the user allowed, a
+/// one-time hint says how to stop iOS asking every time.
 struct ClipboardSection: View {
     @Environment(AppModel.self) private var app
     let ref: MachineRef
@@ -35,12 +36,14 @@ struct ClipboardSection: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .card()
+            if model?.showsPasteHint == true, state.usable { pasteHint }
         }
         .task {
             if model == nil { model = ClipboardModel(deps: Self.deps(app, ref)) }
             await model?.refresh(machineID: ref.id)
             #if DEBUG
             let d = UserDefaults.standard
+            if d.bool(forKey: "showClipboardHint") { model?.preview(fetched: nil, hint: true) }
             // `-showClipboardFetch YES`: runs Get Clipboard against the (mock) hub on opening (screenshots).
             if d.bool(forKey: "showClipboardFetch"), state.usable, online { await fetch() }
             #endif
@@ -133,6 +136,24 @@ struct ClipboardSection: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("clipboard-preview")
+    }
+
+    /// iOS asks before every paste unless Settings › Persona › Paste from Other Apps is Allow.
+    private var pasteHint: some View {
+        NoticeBanner(text: String(localized: "Asked every time? In Settings, set Paste from Other Apps to Allow."), tone: .neutral,
+                     symbol: Theme.Icon.clipboard) {
+            HStack(spacing: Theme.Space.l) {
+                Button(String(localized: "Open Settings")) {
+                    model?.dismissPasteHint()
+                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                }
+                .accessibilityIdentifier("clipboard-hint-settings")
+                Button(String(localized: "Don't Show Again")) { withAnimation(Theme.Motion.layout) { model?.dismissPasteHint() } }
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("clipboard-hint-dismiss")
+            }
+        }
+        .accessibilityIdentifier("clipboard-hint")
     }
 
     private func line(_ text: String, ok: Bool) -> some View {
